@@ -48,7 +48,6 @@ RUN buildDeps=' \
 	&& unzip eclipse-mat.zip \
 	&& chmod +x mat/MemoryAnalyzer \
 	&& sed -i "\\|^-Xmx|c \\-Xmx12g" "mat/MemoryAnalyzer.ini" \
-	&& cat mat/MemoryAnalyzer.ini \
 	&& apt-get purge -y --auto-remove $buildDeps
 
 ENTRYPOINT	[ "mat/MemoryAnalyzer" ]
