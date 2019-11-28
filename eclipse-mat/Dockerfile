@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y \
 	ca-certificates \
 	libcurl4 \
 	libswt-gtk-4-java \
-	libvpx5 \
+	vpx-tools \
 	procps \
 	--no-install-recommends \
 	&& rm -rf /var/lib/apt/lists/*
