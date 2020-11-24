@@ -6,11 +6,14 @@
 #
 # For example to cat to a file:
 #
-# docker run -it \
+# docker run -a stdout \
 #   --network=host \
 #   --volume=/tmp:/tmp \
 #   miel/kafkacat \
 #   kafkacat -b BROKER -t MY-TOPIC -c 100000 -C > /tmp/records
+#
+# Make sure to use "-a stdout" instead of "-it" because the latter allocates a pseudo terminal which
+# uses Windows-style linebreaks and introduces "^M" everywhere, which then messes up parsing of the result.
 #
 # See https://github.com/edenhill/kafkacat for the original Kafkacat util.
 #
