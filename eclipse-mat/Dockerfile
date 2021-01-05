@@ -16,14 +16,17 @@ FROM debian:bullseye-slim
 LABEL maintainer "Miel Donkers <miel.donkers@gmail.com>"
 
 ENV DEBIAN_FRONTEND noninteractive
-ARG MAT_VERSION=1.9.0
-ARG MAT_BUILD_DATE=20190605
+ARG MAT_VERSION=1.11.0
+ARG MAT_BUILD_DATE=20201202
 
 RUN apt-get update && apt-get install -y \
 	ca-certificates \
 	libcurl4 \
 	libswt-gtk-4-java \
-	vpx-tools \
+    libswt-gtk-4-jni \
+    libswt-glx-gtk-4-jni \
+    libswt-webkit-gtk-4-jni \
+    libgtk-3-0 \
 	procps \
 	--no-install-recommends \
 	&& rm -rf /var/lib/apt/lists/*
