@@ -49,7 +49,7 @@ RUN buildDeps=' \
 	&& apt-get purge -y --auto-remove $buildDeps
 
 ENV HOME=/home/lens \
-    USER_ID=1001 \
+    USER_ID=1000 \
     USER_NAME=lens \
     XDG_CONFIG_HOME=/tmp
 
