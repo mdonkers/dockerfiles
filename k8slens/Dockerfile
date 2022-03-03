@@ -38,7 +38,7 @@ RUN buildDeps=' \
 	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends \
     && curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list \
-    && curl -L --fail --show-error --silent https://api.k8slens.dev/binaries/Lens-5.3.4-latest.20220120.1.amd64.deb -o /tmp/lens.deb \
+    && curl -L --fail --show-error --silent https://api.k8slens.dev/binaries/Lens-5.4.0-latest.20220301.1.amd64.deb -o /tmp/lens.deb \
     && apt-get update && apt install -y kubectl less libgtk-4-1 libswt-gtk-4-jni libswt-webkit-gtk-4-jni libasound2 /tmp/lens.deb --no-install-recommends \
     && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" \
     && unzip /tmp/awscliv2.zip -d /tmp \
