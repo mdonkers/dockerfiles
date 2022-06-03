@@ -21,32 +21,51 @@
 #	--name lens \
 #	miel/lens
 #
+FROM node:14-bullseye AS builder
+
+WORKDIR /build
+
+RUN git clone -b v5.5.3 --depth 1 https://github.com/lensapp/lens.git \
+  && cd lens/ \
+  && ELECTRON_BUILDER_EXTRA_ARGS="--linux dir" make build
+
+
+
 FROM debian:bookworm-slim
 LABEL maintainer "Miel Donkers <miel.donkers@gmail.com>"
 
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN buildDeps=' \
-        ca-certificates \
-		curl \
-		gnupg \
-		apt-utils \
-        apt-transport-https \
-		unzip \
-	' \
-	&& set -x \
-	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends \
+      ca-certificates \
+      curl \
+      gnupg \
+      apt-utils \
+      apt-transport-https \
+      unzip \
+      ' \
+    && packages=' \
+      kubectl \
+      less \
+      libasound2 \
+      libgtk-4-1 \
+      libnss3 \
+      libnspr4 \
+      libswt-gtk-4-jni \
+      libswt-webkit-gtk-4-jni \
+      ' \
+    && set -x \
+    && apt-get update && apt-get install -y $buildDeps --no-install-recommends \
     && curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list \
-    && curl -L --fail --show-error --silent https://api.k8slens.dev/binaries/Lens-5.4.0-latest.20220301.1.amd64.deb -o /tmp/lens.deb \
-    && apt-get update && apt install -y kubectl less libgtk-4-1 libswt-gtk-4-jni libswt-webkit-gtk-4-jni libasound2 /tmp/lens.deb --no-install-recommends \
+    && apt-get update && apt-get install -y $packages --no-install-recommends \
     && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" \
     && unzip /tmp/awscliv2.zip -d /tmp \
     && /tmp/aws/install \
     && aws --version \
-    && rm -rf /tmp/aws /tmp/awscliv2.zip /tmp/lens.deb \
-	&& rm -rf /var/lib/apt/lists/* \
-	&& apt-get purge -y --auto-remove $buildDeps
+    && rm -rf /tmp/aws /tmp/awscliv2.zip \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get purge -y --auto-remove $buildDeps
 
 ENV HOME=/home/lens \
     USER_ID=1000 \
@@ -55,9 +74,12 @@ ENV HOME=/home/lens \
 
 RUN groupadd --gid $USER_ID $USER_NAME \
     && useradd --create-home --home-dir $HOME --uid $USER_ID --gid $USER_ID $USER_NAME \
-	&& chown -R $USER_NAME:$USER_NAME $HOME
+    && chown -R $USER_NAME:$USER_NAME $HOME
+
+COPY --from=builder --chown=$USER_NAME:$USER_NAME /build/lens/dist/linux-unpacked $HOME/lens/
+ENV PATH="${HOME}/lens:${PATH}"
 
 WORKDIR $HOME
 USER $USER_ID:$USER_ID
 
-ENTRYPOINT	[ "lens" ]
+ENTRYPOINT [ "open-lens" ]
