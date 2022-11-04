@@ -21,11 +21,11 @@
 #	--name lens \
 #	miel/lens
 #
-FROM node:14-bullseye AS builder
+FROM node:16-bullseye AS builder
 
 WORKDIR /build
 
-RUN git clone -b v5.5.3 --depth 1 https://github.com/lensapp/lens.git \
+RUN git clone -b v6.1.14 --depth 1 https://github.com/lensapp/lens.git \
   && cd lens/ \
   && ELECTRON_BUILDER_EXTRA_ARGS="--linux dir" make build
 
