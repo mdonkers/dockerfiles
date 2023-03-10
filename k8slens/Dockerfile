@@ -45,6 +45,7 @@ RUN buildDeps=' \
       unzip \
       ' \
     && packages=' \
+      google-cloud-cli \
       google-cloud-sdk-gke-gcloud-auth-plugin \
       kubectl \
       less \
