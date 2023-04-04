@@ -25,10 +25,22 @@ FROM node:16-bullseye AS builder
 
 WORKDIR /build
 
-RUN git clone -b v6.2.6 --depth 1 https://github.com/lensapp/lens.git \
+RUN git clone -b v6.4.13 --depth 1 https://github.com/lensapp/lens.git \
   && cd lens/ \
-  && ELECTRON_BUILDER_EXTRA_ARGS="--linux dir" make build
+  && npm install \
+  && npm run build \
+  && ELECTRON_BUILDER_EXTRA_ARGS="--linux dir" yarn lerna run build:dir
 
+
+FROM node:16-bullseye AS extension-builder
+
+WORKDIR /build
+
+RUN git clone --depth 1 https://github.com/alebcay/openlens-node-pod-menu \
+  && cd openlens-node-pod-menu/ \
+  && npm install \
+  && npm run build \
+  && npm pack
 
 
 FROM debian:bookworm-slim
@@ -50,10 +62,7 @@ RUN buildDeps=' \
       kubectl \
       less \
       libasound2 \
-      libgtk-4-1 \
       libnss3 \
-      libnspr4 \
-      libswt-gtk-4-jni \
       libswt-webkit-gtk-4-jni \
       ' \
     && set -x \
@@ -74,13 +83,38 @@ RUN buildDeps=' \
 ENV HOME=/home/lens \
     USER_ID=1000 \
     USER_NAME=lens \
-    XDG_CONFIG_HOME=/tmp
+    XDG_CONFIG_HOME=/tmp \
+    LENS_NODE_POD_MENU_HOME="/home/lens/.k8slens/extensions/alebcay--openlens-node-pod-menu" \
+    LENS_NODE_POD_MENU_TMP="/tmp/OpenLens/node_modules/@alebcay/openlens-node-pod-menu"
 
 RUN groupadd --gid $USER_ID $USER_NAME \
-    && useradd --create-home --home-dir $HOME --uid $USER_ID --gid $USER_ID $USER_NAME \
-    && chown -R $USER_NAME:$USER_NAME $HOME
+    && useradd --create-home --home-dir $HOME --uid $USER_ID --gid $USER_ID $USER_NAME
 
-COPY --from=builder --chown=$USER_NAME:$USER_NAME /build/lens/dist/linux-unpacked $HOME/lens/
+COPY --from=builder --chown=$USER_NAME:$USER_NAME /build/lens/packages/open-lens/dist/linux-unpacked/ $HOME/lens/
+COPY --from=extension-builder --chown=$USER_NAME:$USER_NAME /build/openlens-node-pod-menu/*.tgz $HOME/
+RUN mkdir -p "$LENS_NODE_POD_MENU_HOME" \
+    && mkdir -p "$LENS_NODE_POD_MENU_TMP" \
+    && tar -xzvf $HOME/alebcay-openlens-node-pod-menu-*.tgz --strip-components=1 -C "$LENS_NODE_POD_MENU_HOME" \
+    && tar -xzvf $HOME/alebcay-openlens-node-pod-menu-*.tgz --strip-components=1 -C "$LENS_NODE_POD_MENU_TMP" \
+    && chown -R $USER_NAME:$USER_NAME $HOME \
+    && chown -R $USER_NAME:$USER_NAME /tmp/OpenLens
+
+COPY --chown=$USER_NAME:$USER_NAME <<EOF /tmp/OpenLens/lens-extensions.json
+{
+	"__internal__": {
+		"migrations": {
+			"version": "6.4.0"
+		}
+	},
+	"extensions": {
+		"$LENS_NODE_POD_MENU_TMP/package.json": {
+			"enabled": true,
+			"name": "@alebcay/openlens-node-pod-menu"
+		}
+	}
+}
+EOF
+
 ENV PATH="${HOME}/lens:${PATH}"
 
 WORKDIR $HOME
