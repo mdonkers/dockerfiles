@@ -78,7 +78,10 @@ RUN buildDeps=' \
     && aws --version \
     && rm -rf /tmp/aws /tmp/awscliv2.zip \
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get purge -y --auto-remove $buildDeps
+    && apt-get purge -y --auto-remove $buildDeps \
+    && apt -y autoclean \
+    && apt -y clean \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV HOME=/home/lens \
     USER_ID=1000 \
@@ -96,7 +99,7 @@ RUN mkdir -p "$LENS_NODE_POD_MENU_HOME" \
     && mkdir -p "$LENS_NODE_POD_MENU_TMP" \
     && tar -xzvf $HOME/alebcay-openlens-node-pod-menu-*.tgz --strip-components=1 -C "$LENS_NODE_POD_MENU_HOME" \
     && tar -xzvf $HOME/alebcay-openlens-node-pod-menu-*.tgz --strip-components=1 -C "$LENS_NODE_POD_MENU_TMP" \
-    && chown -R $USER_NAME:$USER_NAME $HOME \
+    && chown -R $USER_NAME:$USER_NAME "$LENS_NODE_POD_MENU_HOME" \
     && chown -R $USER_NAME:$USER_NAME /tmp/OpenLens
 
 COPY --chown=$USER_NAME:$USER_NAME <<EOF /tmp/OpenLens/lens-extensions.json
