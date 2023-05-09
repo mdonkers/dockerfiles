@@ -40,10 +40,12 @@ RUN buildDeps=' \
       unzip \
       ' \
     && packages=' \
-      google-cloud-cli \
-      google-cloud-sdk-gke-gcloud-auth-plugin \
+      curl \
       kubectl \
       less \
+      vim \
+      #google-cloud-cli \
+      #google-cloud-sdk-gke-gcloud-auth-plugin \
       ' \
     && set -x \
     && apt-get update && apt-get install -y $buildDeps --no-install-recommends \
@@ -65,7 +67,8 @@ RUN buildDeps=' \
 
 ENV HOME=/home/k9s \
     USER_ID=1000 \
-    USER_NAME=k9s
+    USER_NAME=k9s \
+    EDITOR=vim
 
 RUN groupadd --gid $USER_ID $USER_NAME \
     && useradd --create-home --home-dir $HOME --uid $USER_ID --gid $USER_ID $USER_NAME
