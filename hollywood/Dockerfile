@@ -10,7 +10,7 @@
 # Copied from JessFraz (https://github.com/mdonkers/dockerfiles-jessfraz) but
 # included utils to fix broken Docker image and status message for exiting
 #
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 LABEL maintainer "Miel Donkers <miel.donkers@gmail.com>"
 
 ENV DEBIAN_FRONTEND noninteractive

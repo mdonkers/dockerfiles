@@ -17,7 +17,7 @@
 #	--name k9s \
 #	miel/k9s
 #
-FROM golang:1.20 AS build
+FROM golang:1.21 AS build
 
 WORKDIR /k9s
 RUN git clone --depth 1 https://github.com/derailed/k9s.git . \
@@ -51,7 +51,6 @@ RUN buildDeps=' \
     && apt-get update && apt-get install -y $buildDeps --no-install-recommends \
     && curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg \
     && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
-    && echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list \
     && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list \
     && apt-get update && apt-get install -y $packages --no-install-recommends \
     && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" \
