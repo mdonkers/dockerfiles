@@ -17,7 +17,7 @@
 #	--name k9s \
 #	miel/k9s
 #
-FROM golang:1.21 AS build
+FROM golang:1.22 AS build
 
 WORKDIR /k9s
 RUN git clone --depth 1 https://github.com/derailed/k9s.git . \
@@ -26,7 +26,7 @@ RUN git clone --depth 1 https://github.com/derailed/k9s.git . \
 # -----------------------------------------------------------------------------
 # Build the final Docker image
 
-FROM debian:bookworm-slim
+FROM debian:testing-slim
 LABEL maintainer "Miel Donkers <miel.donkers@gmail.com>"
 
 ENV DEBIAN_FRONTEND noninteractive
