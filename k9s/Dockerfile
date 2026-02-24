@@ -17,7 +17,7 @@
 #	--name k9s \
 #	miel/k9s
 #
-FROM golang:1.24 AS build
+FROM golang:1.26 AS build
 
 WORKDIR /k9s
 RUN git clone --depth 1 https://github.com/derailed/k9s.git . \
